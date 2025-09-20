@@ -1,11 +1,22 @@
- 
+import { ADD_NEW_WORK_SPACE_REQUEST, FETCH_WORK_SPACE_REQUEST, OPEN_WORK_SPACE_MODEL, SELECT_WORK_SPACE_REQUEST, SHOW_WORK_SPACE } from "../types/workSpaceType"
 
 
-import { OPEN_WORK_SPACE, SELECT_WORK_SPACE_REQUEST } from "../types/workSpaceType"
+export const openWorkSpaceAction = (data) => ({
+    type: OPEN_WORK_SPACE_MODEL,
+    payload: data,
+})
 
+export const addNewWorkSpaceAction = (data) => ({
+    type: ADD_NEW_WORK_SPACE_REQUEST,
+    payload: data,
+})
 
-export const openWorkSpace = (data) => ({
-    type: OPEN_WORK_SPACE,
+export const fetchWorkSpaceAction = () => ({
+    type: FETCH_WORK_SPACE_REQUEST,
+})
+
+export const showWorkSpaceAction = (data) => ({
+    type: SHOW_WORK_SPACE,
     payload: data,
 })
 

@@ -15,7 +15,5 @@ export const endpoints = {
         workSpaces: `${baseApiUrl}/auth/workspaces`,
         
     },
-    FileUpload: {
-        upload: `${baseApiUrl}/upload`,
-    },
+
 }

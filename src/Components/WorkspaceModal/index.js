@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus } from "lucide-react";
-import { openWorkSpace, selectedWorkspaceAction } from "@/redux/actions/workSpaceAction";
+import { openWorkSpaceAction, selectedWorkspaceAction, showWorkSpaceAction } from "@/redux/actions/workSpaceAction";
 import { useDispatch } from "react-redux";
 import { useEffect, useRef } from "react";
 
@@ -10,20 +10,20 @@ const WorkspaceModal = ({ data, selectedWorkspace, setAddWorkSpace }) => {
   const modalRef = useRef(null); // reference for modal
 
   const hanldeAddWorkSpace = () => {
-    setAddWorkSpace(false);
-    dispatch(openWorkSpace(true));
+    dispatch(showWorkSpaceAction(false));
+    dispatch(openWorkSpaceAction(true));
   };
 
   const handleSelectWorkspace = (id) => {
     dispatch(selectedWorkspaceAction(id));
-    setAddWorkSpace(false);
+    dispatch(showWorkSpaceAction(false));
   };
 
   // Close modal if click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setAddWorkSpace(false);
+        dispatch(showWorkSpaceAction(false));
       }
     };
 

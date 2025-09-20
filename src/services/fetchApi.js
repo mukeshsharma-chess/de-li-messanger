@@ -10,8 +10,13 @@ export default class fetchApi extends Api {
         return this.fetch(url, "POST", data).then(response => response)
     }
 
-    GetAllPuja(data) {
-        let url = this.buildUrl(endpoints.Pujas.puja, "full")
+    AddNewWorkSpace(data) {
+        let url = this.buildUrl(endpoints.WorkSpaces.workSpaces, "full")
+        return this.fetch(url, "POST", data).then(response => response)
+    }
+
+    GetAllWorkSpace(data) {
+        let url = this.buildUrl(endpoints.WorkSpaces.workSpaces, "full")
         return this.fetch(url, "GET", null, data).then(response => response)
     }
 

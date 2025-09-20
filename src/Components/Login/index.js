@@ -9,8 +9,8 @@ const LoginComponent = () => {
 
   useEffect(() => {
     const formDataObject = new FormData();
-    formDataObject.append("email", "mukesh@de-li.com");
-    formDataObject.append("password", "Mukesh@123");
+    formDataObject.append("email", "admin@de-li.com");
+    formDataObject.append("password", "secret");
 
     dispatch(userLoginAction(formDataObject)); // sends FormData to saga/reducer
   }, [dispatch]);

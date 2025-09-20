@@ -18,7 +18,7 @@ export function* userLoginSaga({ payload, resolve }) {
             saveState('tokenType', token_type);
             saveState('user', user);
             saveState('expInToken', expires_in);
-            yield put({ type: USER_LOGIN_RESPONSE, payload: data })
+            yield put({ type: USER_LOGIN_RESPONSE, payload: user })
             resolve && resolve(response)
             yield put({ type: RESET_LOADER, isLoading: false })
         }

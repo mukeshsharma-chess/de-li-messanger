@@ -10,19 +10,19 @@ import {
 } from 'lucide-react';
 import WorkspaceModal from '../WorkspaceModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { openWorkSpace } from '@/redux/actions/workSpaceAction';
+import { showWorkSpaceAction } from '@/redux/actions/workSpaceAction';
 
 
 
 const WorkspaceSidebar = ({  workSpaceList, selectedWorkspace }) => {
 
   
-  const { openAddWorkSpace } = useSelector((state) => state.wrokSpace);
+  const { showWorkSpaceModel } = useSelector((state) => state.wrokSpace);
 
   const dispatch = useDispatch();
 
   const handleOpenAddNewWorkModel = () =>{
-    dispatch(openWorkSpace(true))
+    dispatch(showWorkSpaceAction(true))
   }
 
   return (
@@ -30,11 +30,11 @@ const WorkspaceSidebar = ({  workSpaceList, selectedWorkspace }) => {
       
       {/* Top Avatar */}
       <div className="flex flex-col items-center gap-6">
-        <div onClick={() => handleOpenAddNewWorkModel(!openAddWorkSpace)} className="cursor-pointer bg-gray-500 text-black rounded-md w-10 h-10 flex items-center justify-center text-sm font-bold">
+        <div onClick={() => handleOpenAddNewWorkModel(!showWorkSpaceModel)} className="cursor-pointer bg-gray-500 text-black rounded-md w-10 h-10 flex items-center justify-center text-sm font-bold">
           {(workSpaceList?.length) > 0 ? selectedWorkspace.name.charAt(0).toUpperCase() : '+'}
         </div>
         {
-          openAddWorkSpace && (
+          showWorkSpaceModel && (
             <div className="absolute left-[60px] top-[50px] z-50">
               {<WorkspaceModal data ={workSpaceList} selectedWorkspace={selectedWorkspace} setAddWorkSpace = {handleOpenAddNewWorkModel} />}   
             </div>
