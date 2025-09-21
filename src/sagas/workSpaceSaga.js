@@ -35,9 +35,9 @@ export function* fetchAllWrokSpace({ payload, resolve }) {
         yield put({ type: START_LOADING, isLoading: true })
         let response = yield api.GetAllWorkSpace(payload);
 
-        const {data, status} = response;
+        const {data, status, message} = response;
 
-        if (status === 200) {
+        if (message === "List of workspaces") {
             yield put({ type: FETCH_WORK_SPACE_RESPONSE, payload: data })
             resolve && resolve(response)
             yield put({ type: RESET_LOADER, isLoading: false })

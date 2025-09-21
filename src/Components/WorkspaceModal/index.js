@@ -5,7 +5,10 @@ import { openWorkSpaceAction, selectedWorkspaceAction, showWorkSpaceAction } fro
 import { useDispatch } from "react-redux";
 import { useEffect, useRef } from "react";
 
-const WorkspaceModal = ({ data, selectedWorkspace, setAddWorkSpace }) => {
+const WorkspaceModal = ({ allWorkSpace, selectedWorkSpace, showWorkSpaceModel }) => {
+
+  console.log("showWorkSpaceModel", showWorkSpaceModel)
+
   const dispatch = useDispatch();
   const modalRef = useRef(null); // reference for modal
 
@@ -16,7 +19,7 @@ const WorkspaceModal = ({ data, selectedWorkspace, setAddWorkSpace }) => {
 
   const handleSelectWorkspace = (id) => {
     dispatch(selectedWorkspaceAction(id));
-    dispatch(showWorkSpaceAction(false));
+    dispatch(showWorkSpaceAction(!showWorkSpaceModel))
   };
 
   // Close modal if click outside
@@ -31,25 +34,25 @@ const WorkspaceModal = ({ data, selectedWorkspace, setAddWorkSpace }) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setAddWorkSpace]);
+  }, [showWorkSpaceModel]);
 
   return (
     <div
       ref={modalRef}
       className="w-96 bg-gradient-to-b from-[#3c3c3c] to-[#1f1f1f] rounded-xl overflow-hidden text-white shadow-lg"
     >
-      {selectedWorkspace && (
+      {selectedWorkSpace && (
         <div className="p-4">
-          <h3 className="font-semibold text-sm">{selectedWorkspace.name}</h3>
-          <p className="text-xs text-gray-400">{selectedWorkspace.slug}</p>
+          <h3 className="font-semibold text-sm">{selectedWorkSpace.name}</h3>
+          <p className="text-xs text-gray-400">{selectedWorkSpace.slug}</p>
         </div>
       )}
 
       <div className="border-t border-[#2f2f2f]"></div>
 
       <div className="flex flex-col">
-        {data?.map((item, index) => {
-          if (index === 0) return null; // Skip the first item
+        {allWorkSpace?.map((item) => {
+          if (item.id === selectedWorkSpace.id) return null; // Skip the first item
           return (
             <div
               key={item.id}

@@ -13,8 +13,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showWorkSpaceAction } from '@/redux/actions/workSpaceAction';
 
 
+const baseImgUrl = process.env.NEXT_PUBLIC_IMG_BASE_URL
 
-const WorkspaceSidebar = ({  workSpaceList, selectedWorkspace }) => {
+
+const WorkspaceSidebar = ({  allWorkSpace, selectedWorkSpace }) => {
 
   
   const { showWorkSpaceModel } = useSelector((state) => state.wrokSpace);
@@ -31,12 +33,14 @@ const WorkspaceSidebar = ({  workSpaceList, selectedWorkspace }) => {
       {/* Top Avatar */}
       <div className="flex flex-col items-center gap-6">
         <div onClick={() => handleOpenAddNewWorkModel(!showWorkSpaceModel)} className="cursor-pointer bg-gray-500 text-black rounded-md w-10 h-10 flex items-center justify-center text-sm font-bold">
-          {(workSpaceList?.length) > 0 ? selectedWorkspace.name.charAt(0).toUpperCase() : '+'}
+          {selectedWorkSpace && selectedWorkSpace.logo ? 
+            <img className='rounded-md' src={`${baseImgUrl}/${selectedWorkSpace.logo}`} alt={selectedWorkSpace.slug} /> : selectedWorkSpace ?
+           selectedWorkSpace?.name.charAt(0).toUpperCase() : '+'}
         </div>
         {
           showWorkSpaceModel && (
             <div className="absolute left-[60px] top-[50px] z-50">
-              {<WorkspaceModal data ={workSpaceList} selectedWorkspace={selectedWorkspace} setAddWorkSpace = {handleOpenAddNewWorkModel} />}   
+              {<WorkspaceModal allWorkSpace = {allWorkSpace} selectedWorkSpace = {selectedWorkSpace} showWorkSpaceModel = {showWorkSpaceModel} />}   
             </div>
           ) 
         }

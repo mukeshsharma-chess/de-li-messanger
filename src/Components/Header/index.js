@@ -1,19 +1,27 @@
+'use client'
+
 // src/components/Header.jsx
 
 import { Bell, HelpCircle, Search } from 'lucide-react';
+import { useSelector } from 'react-redux';
+
+const baseImgUrl = process.env.NEXT_PUBLIC_IMG_BASE_URL
 
 export default function Header() {
+
+  const {selectedWorkSpace} = useSelector((state) => state.wrokSpace)
+
   return (
     <header className="flex items-center justify-between px-4 py-2 bg-[#350d36] text-white shadow-md">
       {/* Left: Logo and Workspace Name */}
-      <div className="flex items-center space-x-3">
+      {selectedWorkSpace && <div className="flex items-center space-x-3">
         <img
-          src="/images/slack-logo.png"
+          src={`${baseImgUrl}/${selectedWorkSpace.logo}`}
           alt="Slack Logo"
-          className="h-8 w-8 object-contain"
+          className="rounded-md h-10 w-10 object-contain"
         />
-        <span className="text-lg font-semibold">My Workspace</span>
-      </div>
+        <span className="text-lg font-semibold">{selectedWorkSpace?.name}</span>
+      </div>}
 
       {/* Center: Search Bar */}
       <div className="flex-1 mx-4 max-w-md">

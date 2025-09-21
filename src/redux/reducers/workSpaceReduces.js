@@ -1,8 +1,11 @@
-import { CHATTING_WITH_CHANNEL_DATA_RESPONSE, CHATTING_WITH_CHANNEL_DATA_FAILED, 
-    ADD_NEW_CHATTING_WITH_CHANNEL_DATA_RESPONSE, ADD_NEW_CHATTING_WITH_CHANNEL_DATA_FAILED, 
+import {
+    CHATTING_WITH_CHANNEL_DATA_RESPONSE, CHATTING_WITH_CHANNEL_DATA_FAILED,
+    ADD_NEW_CHATTING_WITH_CHANNEL_DATA_RESPONSE, ADD_NEW_CHATTING_WITH_CHANNEL_DATA_FAILED,
     CHATTING_WITH_CHANNEL_DETAILS_DATA_RESPONSE,
-    CHATTING_WITH_CHANNEL_DETAILS_DATA_FAILED} from "../types/chattingWithChannelType"
-import { ADD_NEW_WORK_SPACE_FAILED, ADD_NEW_WORK_SPACE_RESPONSE, FETCH_WORK_SPACE_FAILED, FETCH_WORK_SPACE_RESPONSE, OPEN_WORK_SPACE_MODEL, SHOW_WORK_SPACE } from "../types/workSpaceType"
+    CHATTING_WITH_CHANNEL_DETAILS_DATA_FAILED
+} from "../types/chattingWithChannelType"
+import { ADD_NEW_WORK_SPACE_FAILED, ADD_NEW_WORK_SPACE_RESPONSE, FETCH_WORK_SPACE_FAILED, FETCH_WORK_SPACE_RESPONSE, OPEN_WORK_SPACE_MODEL, 
+    SELECT_WORK_SPACE_REQUEST, SHOW_WORK_SPACE } from "../types/workSpaceType"
 
 
 const initialState = {
@@ -11,24 +14,31 @@ const initialState = {
     allChannel: null,
     allChattingData: null,
     selectedChannel: null,
-    chattingList: null, 
-    openAddWorkSpace: false, 
-    showWorkSpaceModel: false, 
+    selectedWorkSpace: null,
+    chattingList: null,
+    openAddWorkSpace: false,
+    showWorkSpaceModel: false,
 }
 
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
 
+        case FETCH_WORK_SPACE_RESPONSE:
+            return { ...state, allWorkSpace: action.payload, selectedWorkSpace : action.payload[0], 
+                allChannel: action.payload[0].channels, selectedChannel: action.payload[0].channels[0] }
+        case FETCH_WORK_SPACE_FAILED:
+            return { ...state, allWorkSpace: action.payload }
+
+        case SELECT_WORK_SPACE_REQUEST:
+            return { ...state, selectedWorkSpace: state.allWorkSpace.find(item => item.id === action.payload),
+                allChannel : state.allWorkSpace.find(item => item.id === action.payload).channels
+            }
+
         case ADD_NEW_WORK_SPACE_RESPONSE:
             return { ...state, addNewWorkSpace: action.payload }
         case ADD_NEW_WORK_SPACE_FAILED:
             return { ...state, addNewWorkSpace: action.payload }
-
-        case FETCH_WORK_SPACE_RESPONSE:
-            return { ...state, allWorkSpace: action.payload }
-        case FETCH_WORK_SPACE_FAILED:
-            return { ...state, allWorkSpace: action.payload }
 
         case CHATTING_WITH_CHANNEL_DATA_RESPONSE:
             return { ...state, allChattingData: action.payload }
