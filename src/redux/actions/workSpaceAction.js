@@ -1,4 +1,5 @@
-import { ADD_NEW_WORK_SPACE_REQUEST, FETCH_WORK_SPACE_REQUEST, OPEN_WORK_SPACE_MODEL, SELECT_WORK_SPACE_REQUEST, SHOW_WORK_SPACE } from "../types/workSpaceType"
+import { ADD_NEW_CHANNEL_REQUEST, ADD_NEW_WORK_SPACE_REQUEST, FETCH_WORK_SPACE_REQUEST, OPEN_WORK_SPACE_MODEL, 
+    SELECT_WORK_SPACE_REQUEST, SHOW_WORK_SPACE } from "../types/workSpaceType"
 
 
 export const openWorkSpaceAction = (data) => ({
@@ -22,6 +23,11 @@ export const showWorkSpaceAction = (data) => ({
 
 export const selectedWorkspaceAction = (data) => ({
     type: SELECT_WORK_SPACE_REQUEST,
+    payload: data
+})
+
+export const addNewChannelAction = (data) => ({
+    type: ADD_NEW_CHANNEL_REQUEST,
     payload: data
 })
 

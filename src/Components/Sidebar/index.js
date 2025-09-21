@@ -1,21 +1,15 @@
 'use client'
 
 import {
-  MessageSquare,
-  AtSign,
-  Bookmark,
   Hash,
   Users,
-  Grid,
-  FileText,
-  ChevronUp,
   Plus,
   Edit2,
 } from "lucide-react";
 import { useState } from "react";
 import AddNewChannel from "../AddNewChannel";
 
-export default function Sidebar({ user, allChannel, onChannelSelect }) {
+export default function Sidebar({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) {
   const [addNewChannel, setAddNewChannal] = useState(false);
   const [channelName, setChannalName] = useState(false);
 
@@ -42,6 +36,7 @@ export default function Sidebar({ user, allChannel, onChannelSelect }) {
         </div>
       )}
 
+      <hr className="my-3 border-white/20" />
       {/* Default Sidebar Items */}
       <div className="flex flex-col space-y-2 text-sm">
 
@@ -77,19 +72,7 @@ export default function Sidebar({ user, allChannel, onChannelSelect }) {
           <span>Add Channel</span>
         </div>
 
-        {/* Dropdown for Add Channel */}
-        {/* {addNewChannel ? (
-          <div className="absolute mt-2 w-60 rounded-md bg-gray-800 text-white shadow-lg p-2 z-50">
-            <div onClick={handleChannelName} className="hover:bg-gray-700 px-4 py-2 rounded cursor-pointer">
-              Create a new channel
-            </div>
-            <div className="hover:bg-gray-700 px-4 py-2 rounded cursor-pointer">
-              Browse channels
-            </div>
-          </div>
-        ) : null} */}
-
-        {addNewChannel ? <AddNewChannel handleChannelName={handleChannelName} /> : null}
+        {addNewChannel && <AddNewChannel addNewChannel={addNewChannel} setAddNewChannal={setAddNewChannal} selectedWorkSpaceId = {selectedWorkSpaceId} /> }
 
       </div>
     </aside>

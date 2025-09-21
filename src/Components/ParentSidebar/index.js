@@ -26,7 +26,7 @@ const ParentSidebar = () => {
   return (
     <>
         <WorkspaceSidebar allWorkSpace = {allWorkSpace} selectedWorkSpace = {selectedWorkSpace}  />
-        <Sidebar user = {user} allChannel = {allChannel} selectedChannel = {selectedChannel}  />
+        <Sidebar user = {user} allChannel = {allChannel} selectedChannel = {selectedChannel} selectedWorkSpaceId={selectedWorkSpace?.id}  />
     </>
   )
 }

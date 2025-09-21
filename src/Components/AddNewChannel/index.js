@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { RadioGroup } from "@headlessui/react";
+import { addNewChannelAction, fetchWorkSpaceAction } from "@/redux/actions/workSpaceAction";
+import { fetchWithWait } from "@/helper/method";
+import { useDispatch } from "react-redux";
 
 const visibilityOptions = [
   {
@@ -16,13 +19,44 @@ const visibilityOptions = [
   },
 ];
 
-const AddNewChannel = () => {
+const AddNewChannel = ({ addNewChannel, setAddNewChannal, selectedWorkSpaceId }) => {
   const [channelName, setChannelName] = useState("");
   const [visibility, setVisibility] = useState("public");
 
+  const dispatch = useDispatch();
+
+  const handleAddNewChannel = () => {
+    
+    if (channelName.trim()) {
+      const formPayload = new FormData();
+      formPayload.append("name", channelName);
+      formPayload.append("public", visibility);
+
+      const data = {
+        id: selectedWorkSpaceId,
+        formPayload
+      }
+
+      fetchWithWait({ dispatch, action: addNewChannelAction(data) })
+        .then((res) => {
+          if (res.message === "Channel created") {
+            dispatch(fetchWorkSpaceAction());
+            setAddNewChannal(!addNewChannel)
+          } else {
+            alert(res.message);
+          }
+        })
+        .catch((err) => {
+          console.log("error", err);
+        });
+    }
+  }
+
   return (
-    <div className="bg-gray-900 text-white w-[400px] p-6 rounded-lg shadow-xl space-y-5">
-      <button className="text-sm text-gray-400 mb-2 hover:underline">&larr; Back</button>
+    <div className="absolute top-[-100px] left-[200px] bg-gray-900 text-white w-[400px] p-6 rounded-lg shadow-xl space-y-5">
+      <div className="flex justify-end">
+        <button onClick={() => setAddNewChannal(!addNewChannel)} className="text-sm text-gray-400 mb-2 cursor-pointer">X</button>
+      </div>
 
       <h2 className="text-xl font-semibold">Channel details</h2>
 
@@ -56,8 +90,7 @@ const AddNewChannel = () => {
           <div className="space-y-2">
             {visibilityOptions.map((option) => (
               <RadioGroup.Option key={option.value} value={option.value} className={({ checked }) =>
-                `flex items-start space-x-2 p-2 rounded cursor-pointer transition-colors ${
-                  checked ? "bg-gray-800 border border-cyan-400" : "bg-gray-800 border border-transparent"
+                `flex items-start space-x-2 p-2 rounded cursor-pointer transition-colors ${checked ? "bg-gray-800 border border-cyan-400" : "bg-gray-800 border border-transparent"
                 }`
               }>
                 {({ checked }) => (
@@ -80,8 +113,13 @@ const AddNewChannel = () => {
       </div>
 
       <button
-        className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 rounded-md transition duration-150"
-        disabled={!channelName}
+        onClick={handleAddNewChannel}
+        disabled={!channelName.trim()}
+        className={`w-full font-semibold py-2 rounded-md transition duration-150
+          ${channelName.trim()
+            ? "bg-gray-600 hover:bg-cyan-500 text-white cursor-pointer"
+            : "bg-gray-700 text-gray-400 cursor-not-allowed"
+          }`}
       >
         Create
       </button>
