@@ -13,7 +13,9 @@ export const endpoints = {
     },
     WorkSpaces: {
         workSpaces: `${baseApiUrl}/auth/workspaces`,
-        
+    },
+    Channels: {
+        channel: `${baseApiUrl}/auth/channels`,
     },
 
 }

@@ -1,8 +1,10 @@
 import {
-    CHATTING_WITH_CHANNEL_DATA_RESPONSE, CHATTING_WITH_CHANNEL_DATA_FAILED,
+    GET_LATEST_MESSAGE_OF_CHANNEL_RESPONSE, GET_LATEST_MESSAGE_OF_CHANNEL_FAILED,
     ADD_NEW_CHATTING_WITH_CHANNEL_DATA_RESPONSE, ADD_NEW_CHATTING_WITH_CHANNEL_DATA_FAILED,
     CHATTING_WITH_CHANNEL_DETAILS_DATA_RESPONSE,
-    CHATTING_WITH_CHANNEL_DETAILS_DATA_FAILED
+    CHATTING_WITH_CHANNEL_DETAILS_DATA_FAILED,
+    MEMBER_OF_CHANNEL_RESPONSE,
+    MEMBER_OF_CHANNEL_FAILED
 } from "../types/chattingWithChannelType"
 import { ADD_NEW_WORK_SPACE_FAILED, ADD_NEW_WORK_SPACE_RESPONSE, FETCH_WORK_SPACE_FAILED, FETCH_WORK_SPACE_RESPONSE, OPEN_WORK_SPACE_MODEL, 
     SELECT_WORK_SPACE_REQUEST, SHOW_WORK_SPACE } from "../types/workSpaceType"
@@ -12,12 +14,12 @@ const initialState = {
     allWorkSpace: null,
     addNewWorkSpace: null,
     allChannel: null,
-    allChattingData: null,
     selectedChannel: null,
     selectedWorkSpace: null,
     chattingList: null,
     openAddWorkSpace: false,
     showWorkSpaceModel: false,
+    channelMembers: false,
 }
 
 
@@ -40,10 +42,10 @@ export default function reducer(state = initialState, action) {
         case ADD_NEW_WORK_SPACE_FAILED:
             return { ...state, addNewWorkSpace: action.payload }
 
-        case CHATTING_WITH_CHANNEL_DATA_RESPONSE:
-            return { ...state, allChattingData: action.payload }
-        case CHATTING_WITH_CHANNEL_DATA_FAILED:
-            return { ...state, allChattingData: action.payload }
+        case GET_LATEST_MESSAGE_OF_CHANNEL_RESPONSE:
+            return { ...state, chattingList: action.payload }
+        case GET_LATEST_MESSAGE_OF_CHANNEL_FAILED:
+            return { ...state, chattingList: action.payload }
 
         case ADD_NEW_CHATTING_WITH_CHANNEL_DATA_RESPONSE:
             return { ...state, addedChadhava: action.payload }
@@ -54,6 +56,11 @@ export default function reducer(state = initialState, action) {
             return { ...state, chadhavaDetail: action.payload }
         case CHATTING_WITH_CHANNEL_DETAILS_DATA_FAILED:
             return { ...state, chadhavaDetail: action.payload }
+
+        case MEMBER_OF_CHANNEL_RESPONSE:
+            return { ...state, channelMembers: action.payload }
+        case MEMBER_OF_CHANNEL_FAILED:
+            return { ...state, channelMembers: action.payload }
 
         case OPEN_WORK_SPACE_MODEL:
             return { ...state, openAddWorkSpace: action.payload }

@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import AddNewChannel from "../AddNewChannel";
 
-export default function Sidebar({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) {
+const Sidebar = ({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) => {
   const [addNewChannel, setAddNewChannal] = useState(false);
   const [channelName, setChannalName] = useState(false);
 
@@ -91,3 +91,5 @@ function SidebarItem({ icon, label, onClick }) {
     </div>
   );
 }
+
+export default Sidebar;

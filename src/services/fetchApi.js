@@ -25,4 +25,14 @@ export default class fetchApi extends Api {
         return this.fetch(url, "POST", data.formPayload).then(response => response)
     }
 
+    GetChannelMembers(data) {
+        let url = this.buildUrl(`${endpoints.Channels.channel}/${data.channelId}/members`, "full")
+        return this.fetch(url, "GET", null, null).then(response => response)
+    }
+
+    GetLatestMessagesChannel(data) {
+        let url = this.buildUrl(`${endpoints.Channels.channel}/${data.channelId}/messages`, "full")
+        return this.fetch(url, "GET", null, null).then(response => response)
+    }
+
 }

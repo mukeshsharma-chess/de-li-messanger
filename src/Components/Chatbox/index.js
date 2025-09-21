@@ -1,7 +1,8 @@
 "use client";
 
 import { fetchWithWait } from "@/helper/method";
-import { chattingWithChannelAction, deleteChattingWithChannelAction, fetchChattingDataWithChannel } from "@/redux/actions/chattingWithChannelAction";
+import { chattingWithChannelAction, deleteChattingWithChannelAction, getLatestMessageOfParticularChannel,
+   membersOfChannelAction, updatedChattingWithChannelAction } from "@/redux/actions/chattingWithChannelAction";
 import {
   Paperclip,
   ImagePlus,
@@ -13,10 +14,13 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import EditMessageModal from "../EditMessageModal";
+import ChannelInfoSidebar from "../ChannelInfoSidebar";
 
 export default function ChatBody() {
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -27,22 +31,36 @@ export default function ChatBody() {
   const [previewType, setPreviewType] = useState(null);
   const [caption, setCaption] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
 
   // Dropdown & edit
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [editIdx, setEditIdx] = useState(null);
-  const [editValue, setEditValue] = useState("");
-
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editMsg, setEditMsg] = useState("");
+  const [editMsgData, setMsgData] = useState(null);
   const dispatch = useDispatch();
 
-  const { selectedChannel, chattingList } = useSelector((state) => state.wrokSpace);
+  const { selectedChannel, chattingList, channelMembers } = useSelector((state) => state.wrokSpace);
   const { user } = useSelector((state) => state.login);
+
 
   useEffect(() => {
     if (selectedChannel) {
-      dispatch(fetchChattingDataWithChannel({ channelId: selectedChannel.id }));
+      dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
+      dispatch(membersOfChannelAction({ channelId: selectedChannel.id }));
     }
   }, [selectedChannel]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chattingList]);
+
+  console.log("chattingListchattingList", chattingList)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   /** ---- Send text only ---- **/
   const handleSend = () => {
@@ -55,9 +73,9 @@ export default function ChatBody() {
 
       fetchWithWait({ dispatch, action: chattingWithChannelAction(formData) }).then((res) => {
         if (res.status === 200) {
-            dispatch(fetchChattingDataWithChannel({ channelId: selectedChannel.id }));
+          dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
         } else {
-            alert(res.message)
+          alert(res.message)
         }
       }).catch((e) => {
         console.log(`error`, e)
@@ -107,24 +125,14 @@ export default function ChatBody() {
 
       fetchWithWait({ dispatch, action: chattingWithChannelAction(formData) }).then((res) => {
         if (res.status === 200) {
-            dispatch(fetchChattingDataWithChannel({ channelId: selectedChannel.id }));
+          dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
         } else {
-            alert(res.message)
+          alert(res.message)
         }
       }).catch((e) => {
         console.log(`error`, e)
       })
 
-      setMessages([
-        ...messages,
-        {
-          text: caption || input,
-          file: previewType === "file" ? previewFile : null,
-          images: previewType === "image" ? [previewFileUrl] : null,
-        },
-      ]);
-
-      // reset modal
       setPreviewFile(null);
       setPreviewFileUrl(null);
       setCaption("");
@@ -136,64 +144,83 @@ export default function ChatBody() {
 
   /** ---- Delete message ---- **/
   const handleDeleteMsg = (id) => {
-
     fetchWithWait({ dispatch, action: deleteChattingWithChannelAction(id) }).then((res) => {
+      if (res.status === 200) {
+        dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
+      } else {
+        alert(res.message)
+      }
+    }).catch((e) => {
+      console.log(`error`, e)
+    })
+  };
+
+  /** ---- Open Edit Modal ---- **/
+  const handleEditMsg = (msg) => {
+    console.log("Editing message:", msg);
+    setMsgData(msg)
+    setEditMsg(msg.message);
+    setEditModalOpen(true);
+    setOpenDropdown(null);
+  };
+
+  /** ---- Save Edit ---- **/
+  const handleEditSave = () => {
+    if (!newValue.trim()) return;
+
+ try {
+      const formData = new FormData();
+      formData.append("channel_id", editMsgData.id);
+      formData.append("user_id", editMsgData.id);
+      formData.append("message", caption || editMsg);
+
+      if (previewType === "image" || previewType === "file") {
+        formData.append("attachments[]", previewFile, previewFile.name);
+      }
+
+      fetchWithWait({ dispatch, action: updatedChattingWithChannelAction(formData) }).then((res) => {
         if (res.status === 200) {
-            dispatch(fetchChattingDataWithChannel({ channelId: selectedChannel.id }));
+          dispatch(getLatestMessageOfParticularChannel({ channelId: editMsgData.id }));
         } else {
-            alert(res.message)
+          alert(res.message)
         }
       }).catch((e) => {
         console.log(`error`, e)
       })
-    
 
-    setMessages(messages.filter((_, i) => i !== idx));
-    setOpenDropdown(null);
-  };
-
-  /** ---- Edit message ---- **/
-  const handleEditMsg = (idx) => {
-    setEditIdx(idx);
-    setEditValue(messages[idx]?.text || "");
-    setOpenDropdown(null);
-  };
-
-  const handleEditSave = () => {
-    if (editValue.trim()) {
-      setMessages((prev) =>
-        prev.map((msg, i) => (i === editIdx ? { ...msg, text: editValue } : msg))
-      );
-      setEditIdx(null);
-      setEditValue("");
+      setCaption("");
+      setEditMsg("");
+      setShowModal(false);
+    } catch (err) {
+      console.error("Error sending message:", err);
     }
+
+    setEditModalOpen(false);
+    setEditMsg(null);
   };
 
-  const handleEditCancel = () => {
-    setEditIdx(null);
-    setEditValue("");
-  };
-
-  // console.log("selectedChannelselectedChannel", selectedChannel);
+  // console.log("channelMemberschannelMembers:", channelMembers);
 
   return (
     <div className="flex flex-col flex-1 h-screen bg-white">
       {/* Chat Header */}
-      <div className="p-4 border-b font-bold text-lg text-gray-800 shadow-sm">
+      <div className="p-4 cursor-pointer border-b font-bold text-lg text-gray-800 shadow-sm" onClick={() => setSidebarOpen(true)}>
         # {selectedChannel ? selectedChannel.name : "Select a channel"}
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100">
-        {chattingList?.map((msg, idx) => {
+        {[...(chattingList || [])]?.reverse()?.map((msg, idx) => {
           // Parse attachments safely
-          // console.log("MessageMessage:", );
-          let attachments = [];
-          try {
-            attachments = msg.attachments ? JSON.parse(msg.attachments) : [];
-          } catch (e) {
-            attachments = [];
-          }
+
+          let attachments = msg.attachments ? msg.attachments : [];
+          
+
+          const isMine = msg.user_id === user.id;
+          const time = new Date(msg.created_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
           return (
             <div key={msg.id} className="group relative w-fit max-w-lg">
@@ -230,7 +257,7 @@ export default function ChatBody() {
                       Delete message... <span className="text-red-300">delete</span>
                     </li>
                     <li
-                      onClick={() => handleEditMsg(idx)}
+                      onClick={() => handleEditMsg(msg)}
                       className="hover:bg-gray-700 px-4 py-2 cursor-pointer"
                     >
                       Edit message <span className="text-gray-400">E</span>
@@ -241,67 +268,55 @@ export default function ChatBody() {
 
               {/* Message content */}
               <div className="text-sm text-gray-800">
-                {editIdx === idx && msg.message !== undefined ? (
-                  <div className="flex gap-2 items-center">
-                    <input
-                      className="border rounded px-2 py-1 text-sm flex-1"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      autoFocus
-                    />
-                    <button onClick={handleEditSave} className="text-green-600 font-bold px-2">
-                      Save
-                    </button>
-                    <button onClick={handleEditCancel} className="text-gray-500 px-2">
-                      Cancel
-                    </button>
+                {/* Normal text message */}
+                {!attachments?.length && msg.message && (
+                  <div className="bg-white p-2 rounded shadow max-w-sm"><span className="p-2 block">{msg.user.first_name}</span>
+                    <p className="text-sm mb-2 text-gray-700">{msg.message}</p>
+                    <span className="text-xs text-gray-300 block mt-1 text-right">{time}</span>
                   </div>
-                ) : (
-                  <>
-                    {/* Normal text message */}
-                    {!msg.attachments && msg.message && (
-                      <div className="bg-white p-2 rounded shadow max-w-sm"><span className="p-2 block">{msg.user.first_name}</span>
-                      <p className="text-sm mb-2 text-gray-700">{msg.message}</p></div>
-                    )}
-
-                    {/* If attachments exist */}
-                    {attachments.length > 0 &&
-                      attachments.map((file, i) => {
-                        if (file.file_type.startsWith("image/")) {
-                          return (
-                            <div key={i} className="bg-white p-2 rounded shadow max-w-sm">
-                              <span className="p-2 block">{msg.user.first_name}</span>
-                              {msg.message && <p className="text-sm mb-2 text-gray-700">{msg.message}</p>}
-                              <img
-                                src={`/${file.file_path}`}
-                                alt={file.original_name}
-                                className="rounded max-h-60 object-cover"
-                              />
-                            </div>
-                          );
-                        } else {
-                          return (
-                            <div key={i} className="bg-white p-2 rounded shadow max-w-sm text-xs text-gray-600">
-                              <span className="p-2 block">{msg.user.first_name}</span>
-                              {msg.message && <p className="text-sm mb-2 text-gray-700">{msg.message}</p>}
-                              📎 <a
-                                href={`/${file.file_path}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
-                              >
-                                {file.original_name}
-                              </a>
-                            </div>
-                          );
-                        }
-                      })}
-                  </>
                 )}
+
+                {/* If attachments exist */}
+                {attachments.length > 0 &&
+                  attachments.map((file, i) => {
+                    console.log("fileileileile", file);
+                    if (file.file_type === "image" || file.file_type === "jpeg" || file.file_type === "png" || file.file_type === "gif" || file.file_type === "video") {
+                      return (
+                        <div key={i} className="bg-white p-2 rounded shadow max-w-sm">
+                          <span className="p-2 block">{msg.user.first_name}</span>
+                          {msg.message && <p className="text-sm mb-2 text-gray-700">{msg.message}</p>}
+                          <img
+                            src={`/${file.file_path}`}
+                            alt={file.original_name}
+                            className="rounded max-h-60 object-cover"
+                          />
+                          <span className="text-xs text-gray-300 block mt-1 text-right">{time}</span>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div key={i} className="bg-white p-2 rounded shadow max-w-sm text-xs text-gray-600">
+                          <span className="p-2 block">{msg.user.first_name}</span>
+                          {msg.message && <p className="text-sm mb-2 text-gray-700">{msg.message}</p>}
+                          📎 <a
+                            href={`/${file.file_path}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            {file.original_name}
+                          </a>
+                          <span className="text-xs text-gray-300 block mt-1 text-right">{time}</span>
+                        </div>
+                      );
+                    }
+                  })}
               </div>
             </div>
           );
         })}
+        {/* Invisible div to scroll into view */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Chat Input */}
@@ -329,6 +344,22 @@ export default function ChatBody() {
           <input type="file" accept="image/*" ref={imageInputRef} onChange={handleImageUpload} className="hidden" />
         </div>
       </div>
+
+      {/* Edit Modal */}
+      <EditMessageModal
+        open={editModalOpen}
+        initialValue={editMsg && editMsg}
+        onClose={() => setEditModalOpen(false)}
+        onSave={handleEditSave}
+      />
+
+      <ChannelInfoSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        channel={selectedChannel}
+        members={channelMembers || []}
+      />
+
 
       {/* Modal Preview */}
       {showModal && (
