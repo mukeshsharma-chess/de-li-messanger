@@ -7,7 +7,6 @@ import { useEffect, useRef } from "react";
 
 const WorkspaceModal = ({ allWorkSpace, selectedWorkSpace, showWorkSpaceModel }) => {
 
-  console.log("showWorkSpaceModel", showWorkSpaceModel)
 
   const dispatch = useDispatch();
   const modalRef = useRef(null); // reference for modal

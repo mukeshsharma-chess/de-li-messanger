@@ -41,7 +41,7 @@ export default function ChannelInfoSidebar({ open, onClose, channel, members }) 
                 className="flex items-center gap-3 border-b pb-2"
               >
                 <img
-                  src={m.profile || "/default-avatar.png"}
+                  src={m.profile || "/images/individual.webp"}
                   alt={m.first_name}
                   className="w-8 h-8 rounded-full"
                 />

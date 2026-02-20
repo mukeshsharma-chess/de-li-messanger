@@ -1,3 +1,5 @@
+// Components/Sidebar/index.js
+
 'use client'
 
 import {
@@ -8,14 +10,15 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import AddNewChannel from "../AddNewChannel";
+import { useDispatch } from "react-redux";
 
-const Sidebar = ({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) => {
+const Sidebar = ({ user, allChannel, selectedChannel, selectedWorkSpaceId }) => {
   const [addNewChannel, setAddNewChannal] = useState(false);
-  const [channelName, setChannalName] = useState(false);
 
-  const handleChannelName = () => {
-    setAddNewChannal(!addNewChannel);
-    setChannalName(!channelName);
+  const dispatch = useDispatch();
+
+  const handleSelectedChannel = (data) => {
+    dispatch({ type: 'SET_SELECTED_CHANNEL', payload: data });
   };
 
   return (
@@ -36,7 +39,7 @@ const Sidebar = ({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) => 
         </div>
       )}
 
-      <hr className="my-3 border-white/20" />
+      <div className="flex justify-between items-center mb-4 px-2" />
       {/* Default Sidebar Items */}
       <div className="flex flex-col space-y-2 text-sm">
 
@@ -46,7 +49,8 @@ const Sidebar = ({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) => 
             key={channel.id}
             icon={<Hash size={16} />}
             label={channel.name}
-            onClick={() => onChannelSelect(channel)} // ✅ handle channel click
+            active = {selectedChannel?.id === channel.id}
+            onClick={() => handleSelectedChannel(channel)} // ✅ handle channel click
           />
         ))}
 
@@ -54,13 +58,13 @@ const Sidebar = ({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) => 
 
       </div>
 
-      <hr className="my-3 border-white/20" />
+      <div className="flex justify-between items-center mb-4 px-2" /> 
 
       <div className="text-xs uppercase font-bold text-white/70 px-2 mb-2">
         Channels
       </div>
 
-      <hr className="my-3 border-white/20" />
+      <div className="flex justify-between items-center mb-4 px-2" />
 
       {/* Add Channel */}
       <div className="relative">
@@ -80,10 +84,10 @@ const Sidebar = ({ user, allChannel, onChannelSelect, selectedWorkSpaceId }) => 
 }
 
 /* Sidebar Item Component */
-function SidebarItem({ icon, label, onClick }) {
+function SidebarItem({ icon, label, onClick, active }) {
   return (
     <div
-      className="flex items-center px-2 py-1 hover:bg-white/10 rounded cursor-pointer"
+      className={`flex items-center px-2 py-1 hover:bg-white/10 rounded cursor-pointer ${active ? 'bg-white/20 font-bold' : ''}`}
       onClick={onClick}
     >
       <span className="mr-3">{icon}</span>

@@ -40,7 +40,7 @@ export default function Header() {
         <HelpCircle className="w-5 h-5 cursor-pointer hover:text-gray-300" />
         <Bell className="w-5 h-5 cursor-pointer hover:text-gray-300" />
         <img
-          src="/images/avatar.png"
+          src="/images/individual.webp"
           alt="User Avatar"
           className="h-8 w-8 rounded-full border border-white cursor-pointer"
         />

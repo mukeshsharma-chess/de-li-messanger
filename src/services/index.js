@@ -17,10 +17,13 @@ export default class Api {
     fetch = async (url, method, body, params = {}) => {
         const token = loadState("token");
 
+        // ✅ only add JSON header if body is NOT FormData
+        const isFormData = body instanceof FormData;
+
         const headers = {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token ? token : ""}`,
             Accept: "application/json, text/plain, */*",
+            ...(isFormData ? {} : { "Content-Type": "application/json" }),
         };
 
         try {
@@ -38,6 +41,7 @@ export default class Api {
             throw error;
         }
     };
+
 
     // queryParams = (params) => {
     //     return Object.keys(params)

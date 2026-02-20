@@ -1,6 +1,6 @@
 "use client";
 import { fetchWithWait } from "@/helper/method";
-import { addNewWorkSpaceAction, fetchWorkSpaceAction } from "@/redux/actions/workSpaceAction";
+import { addNewWorkSpaceAction, fetchWorkSpaceAction, openWorkSpaceAction } from "@/redux/actions/workSpaceAction";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -32,28 +32,11 @@ const AddNewWorkSpace = () => {
     }
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   const { companyName, name, profilePhoto, emails } = formData;
 
-  //   const arrEmails = emails.split(',').map(email => email.trim());
-
-  //   const formPayload = new FormData();
-  //   formPayload.append("companyName", companyName);
-  //   formPayload.append("name", name);
-  //   formPayload.append("profilePhoto", profilePhoto);
-
-  //   // formPayload.append("emails", JSON.stringify(arrEmails));
-
-
-
-  //   console.log("Form Data Submitted:", formPayload);
-  // };
 
   const handleSubmit = (e) => {
   e.preventDefault();
   const { companyName, name, profilePhoto, emails } = formData;
-
   // Convert emails → array
   const arrEmails = emails
     .split(',')
@@ -71,15 +54,16 @@ const AddNewWorkSpace = () => {
   });
 
   // ✅ Debug payload
-  for (let [key, value] of formPayload.entries()) {
-    console.log(key, value);
-  }
+  // for (let [key, value] of formPayload.entries()) {
+  //   console.log(key, value);
+  // }
 
   // ✅ Call action correctly
   fetchWithWait({ dispatch, action: addNewWorkSpaceAction(formPayload) })
     .then((res) => {
       if (res.status === 200) {
         dispatch(fetchWorkSpaceAction());
+        dispatch(openWorkSpaceAction(false));
       } else {
         alert(res.message);
       }
@@ -90,11 +74,13 @@ const AddNewWorkSpace = () => {
 };
 
 
+const closeModel = () => {
+  dispatch(openWorkSpaceAction(false));
+}
 
 
 
-
-console.log("useruser", user)
+// console.log("useruser", user)
 
 return (
   <div className="flex justify-center items-center min-h-screen text-white">
@@ -163,6 +149,7 @@ return (
           <div className="grid grid-cols-2 gap-4 mt-6">
             <div className="flex justify-end">
               <button
+                onClick={closeModel}
                 type="button"
                 className="bg-red-600 px-6 py-2 rounded-lg text-white cursor-pointer"
               >

@@ -1,3 +1,5 @@
+// Components/WorkSidebar/index.js
+
 'use client'
 
 import {
@@ -76,7 +78,7 @@ const WorkspaceSidebar = ({  allWorkSpace, selectedWorkSpace }) => {
 
         <div className="relative">
           <img
-            src="/images/sample-user.png"
+            src="/images/individual.webp"
             alt="User"
             className="w-10 h-10 rounded-xl object-cover"
           />

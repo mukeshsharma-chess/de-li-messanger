@@ -16,6 +16,7 @@ export const endpoints = {
     },
     Channels: {
         channel: `${baseApiUrl}/auth/channels`,
+        messages: `${baseApiUrl}/auth/messages`,
     },
 
 }

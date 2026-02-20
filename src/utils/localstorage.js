@@ -21,24 +21,20 @@ export const saveState = (key, value) => {
   }
 };
 
-// export const loadCookies = (key) => {
-//   try {
-//     const serializedState = Cookies.get(key);
-//     if(serializedState === null) {
-//         return undefined;
-//     }
-//     return JSON.parse(serializedState);
-//   }
-//   catch (err) {
-//     return undefined;
-//   }
-// };
+// utils/parseAttachments.js
+export function parseAttachments(data) {
+  if (!data) return [];
+  try {
+    if (Array.isArray(data)) return data;
 
-// export const saveCookies = (key, value) => {
-//   try {
-//     Cookies.set(key, JSON.stringify(value));
-//   }
-//   catch (err) {
+    if (typeof data === "string") {
+      return JSON.parse(data);
+    }
 
-//   }
-// };
+    // fallback
+    return [];
+  } catch (err) {
+    console.error("Error parsing attachments:", data, err);
+    return [];
+  }
+}

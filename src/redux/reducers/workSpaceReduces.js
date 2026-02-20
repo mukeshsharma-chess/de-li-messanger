@@ -7,7 +7,7 @@ import {
     MEMBER_OF_CHANNEL_FAILED
 } from "../types/chattingWithChannelType"
 import { ADD_NEW_WORK_SPACE_FAILED, ADD_NEW_WORK_SPACE_RESPONSE, FETCH_WORK_SPACE_FAILED, FETCH_WORK_SPACE_RESPONSE, OPEN_WORK_SPACE_MODEL, 
-    SELECT_WORK_SPACE_REQUEST, SHOW_WORK_SPACE } from "../types/workSpaceType"
+    SELECT_WORK_SPACE_REQUEST, SET_SELECTED_CHANNEL, SHOW_WORK_SPACE } from "../types/workSpaceType"
 
 
 const initialState = {
@@ -34,8 +34,12 @@ export default function reducer(state = initialState, action) {
 
         case SELECT_WORK_SPACE_REQUEST:
             return { ...state, selectedWorkSpace: state.allWorkSpace.find(item => item.id === action.payload),
-                allChannel : state.allWorkSpace.find(item => item.id === action.payload).channels
+                allChannel : state.allWorkSpace.find(item => item.id === action.payload).channels,
+                selectedChannel: state.allWorkSpace.find(item => item.id === action.payload).channels[0]
             }
+
+        case SET_SELECTED_CHANNEL:
+             return { ...state, selectedChannel: action.payload }
 
         case ADD_NEW_WORK_SPACE_RESPONSE:
             return { ...state, addNewWorkSpace: action.payload }

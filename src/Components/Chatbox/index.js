@@ -1,14 +1,17 @@
 "use client";
 
 import { fetchWithWait } from "@/helper/method";
-import { chattingWithChannelAction, deleteChattingWithChannelAction, getLatestMessageOfParticularChannel,
-   membersOfChannelAction, updatedChattingWithChannelAction } from "@/redux/actions/chattingWithChannelAction";
+import {
+  chattingWithChannelAction, deleteChattingWithChannelAction, getLatestMessageOfParticularChannel,
+  membersOfChannelAction, updatedChattingWithChannelAction
+} from "@/redux/actions/chattingWithChannelAction";
 import {
   Paperclip,
   ImagePlus,
   MessageSquare,
   CornerUpRight,
   MoreVertical,
+  Download,
   X,
   Send,
 } from "lucide-react";
@@ -16,6 +19,9 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EditMessageModal from "../EditMessageModal";
 import ChannelInfoSidebar from "../ChannelInfoSidebar";
+import { parseAttachments } from "@/utils/localstorage";
+
+const baseImgUrl = process.env.NEXT_PUBLIC_IMG_BASE_URL
 
 export default function ChatBody() {
   const fileInputRef = useRef(null);
@@ -40,6 +46,7 @@ export default function ChatBody() {
   const [editMsg, setEditMsg] = useState("");
   const [editMsgData, setMsgData] = useState(null);
   const dispatch = useDispatch();
+   const [imagePreview, setImagePreview] = useState(null);
 
   const { selectedChannel, chattingList, channelMembers } = useSelector((state) => state.wrokSpace);
   const { user } = useSelector((state) => state.login);
@@ -56,8 +63,6 @@ export default function ChatBody() {
     scrollToBottom();
   }, [chattingList]);
 
-  console.log("chattingListchattingList", chattingList)
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -72,11 +77,11 @@ export default function ChatBody() {
       formData.append("message", input);
 
       fetchWithWait({ dispatch, action: chattingWithChannelAction(formData) }).then((res) => {
-        if (res.status === 200) {
-          dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
-        } else {
-          alert(res.message)
-        }
+        // if (res.status === 200) {
+        dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
+        // } else {
+        //   alert(res.message)
+        // }
       }).catch((e) => {
         console.log(`error`, e)
       })
@@ -109,7 +114,19 @@ export default function ChatBody() {
     }
   };
 
-  /** ---- Confirm send from modal ---- **/
+  /** ---- Multiple File Upload ---- **/
+  // const handleFilesUpload = (e) => {
+  //   const files = Array.from(e.target.files); // convert FileList → Array
+  //   if (files.length > 0) {
+  //     setPreviewFile(files); // store array of files
+  //     setPreviewType("files");
+  //     setShowModal(true);
+  //   }
+  // };
+
+  console.log("chattingList", chattingList)
+
+
   const handleConfirmSend = async (e) => {
     e.preventDefault();
 
@@ -119,7 +136,12 @@ export default function ChatBody() {
       formData.append("user_id", user.id);
       formData.append("message", caption || input);
 
+      // if (previewType === "image" || previewType === "file") {
+      //   formData.append("attachments[]", previewFile);
+      // }
+
       if (previewType === "image" || previewType === "file") {
+        // formData.append("attachments[]", previewFile);
         formData.append("attachments[]", previewFile, previewFile.name);
       }
 
@@ -144,12 +166,13 @@ export default function ChatBody() {
 
   /** ---- Delete message ---- **/
   const handleDeleteMsg = (id) => {
+    alert("Are you sure to delete this message?")
     fetchWithWait({ dispatch, action: deleteChattingWithChannelAction(id) }).then((res) => {
-      if (res.status === 200) {
-        dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
-      } else {
-        alert(res.message)
-      }
+      // if (res.status === 200) {
+      dispatch(getLatestMessageOfParticularChannel({ channelId: selectedChannel.id }));
+      // } else {
+      alert(res.message)
+      // }
     }).catch((e) => {
       console.log(`error`, e)
     })
@@ -168,7 +191,7 @@ export default function ChatBody() {
   const handleEditSave = () => {
     if (!newValue.trim()) return;
 
- try {
+    try {
       const formData = new FormData();
       formData.append("channel_id", editMsgData.id);
       formData.append("user_id", editMsgData.id);
@@ -199,7 +222,7 @@ export default function ChatBody() {
     setEditMsg(null);
   };
 
-  // console.log("channelMemberschannelMembers:", channelMembers);
+  console.log("channelMemberschannelMembers:", channelMembers);
 
   return (
     <div className="flex flex-col flex-1 h-screen bg-white">
@@ -209,12 +232,12 @@ export default function ChatBody() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100">
-        {[...(chattingList || [])]?.reverse()?.map((msg, idx) => {
-          // Parse attachments safely
 
-          let attachments = msg.attachments ? msg.attachments : [];
-          
+      {/* <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100">
+        {Array.isArray(chattingList) && [...(chattingList || [])]?.reverse()?.map((msg, idx) => {
+
+          let attachments = parseAttachments(msg.attachments);
+
 
           const isMine = msg.user_id === user.id;
           const time = new Date(msg.created_at).toLocaleTimeString([], {
@@ -224,7 +247,6 @@ export default function ChatBody() {
 
           return (
             <div key={msg.id} className="group relative w-fit max-w-lg">
-              {/* Message actions */}
               <div className="absolute top-0 right-[-89px] hidden group-hover:flex gap-1 bg-gray-800 text-white p-1 rounded z-10">
                 <button className="hover:text-green-400 p-1">
                   <MessageSquare size={16} />
@@ -240,7 +262,6 @@ export default function ChatBody() {
                 </button>
               </div>
 
-              {/* Dropdown */}
               {openDropdown === idx && (
                 <div className="absolute top-6 right-[-300px] bg-gray-800 text-white text-sm rounded shadow-lg w-64 z-20">
                   <ul className="divide-y divide-gray-700">
@@ -266,9 +287,7 @@ export default function ChatBody() {
                 </div>
               )}
 
-              {/* Message content */}
               <div className="text-sm text-gray-800">
-                {/* Normal text message */}
                 {!attachments?.length && msg.message && (
                   <div className="bg-white p-2 rounded shadow max-w-sm"><span className="p-2 block">{msg.user.first_name}</span>
                     <p className="text-sm mb-2 text-gray-700">{msg.message}</p>
@@ -276,20 +295,20 @@ export default function ChatBody() {
                   </div>
                 )}
 
-                {/* If attachments exist */}
                 {attachments.length > 0 &&
                   attachments.map((file, i) => {
-                    console.log("fileileileile", file);
-                    if (file.file_type === "image" || file.file_type === "jpeg" || file.file_type === "png" || file.file_type === "gif" || file.file_type === "video") {
+                    if (file.file_type === "image" || file.file_type === "image/jpeg" || file.file_type === "jpeg" || file.file_type === "png" || file.file_type === "gif" || file.file_type === "image/webp" || file.file_type === "video") {
                       return (
                         <div key={i} className="bg-white p-2 rounded shadow max-w-sm">
                           <span className="p-2 block">{msg.user.first_name}</span>
                           {msg.message && <p className="text-sm mb-2 text-gray-700">{msg.message}</p>}
                           <img
-                            src={`/${file.file_path}`}
+                            src={`${baseImgUrl}/${file.file_path}`}
                             alt={file.original_name}
-                            className="rounded max-h-60 object-cover"
+                            className="rounded max-h-60 object-cover cursor-pointer hover:opacity-90"
+                            onClick={() => setImagePreview(`${baseImgUrl}/${file.file_path}`)}
                           />
+
                           <span className="text-xs text-gray-300 block mt-1 text-right">{time}</span>
                         </div>
                       );
@@ -315,7 +334,131 @@ export default function ChatBody() {
             </div>
           );
         })}
-        {/* Invisible div to scroll into view */}
+        <div ref={messagesEndRef} />
+      </div> */}
+
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100">
+
+        {[...(chattingList || [])]?.reverse()?.map((msg, idx) => {
+         
+          const attachments = parseAttachments(msg.attachments);
+
+          const isMine = msg.user_id === user?.id;
+          const time = new Date(msg.created_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          return (
+            <div key={msg.id} className="group relative w-fit max-w-lg">
+            
+              <div className="absolute top-0 right-[-70px] w-[80px] hidden group-hover:flex gap-1 bg-gray-800 text-white p-1 rounded z-10">
+                <button className="hover:text-green-400 p-1">
+                  <MessageSquare size={16} />
+                </button>
+                <button className="hover:text-yellow-400 p-1">
+                  <CornerUpRight size={16} />
+                </button>
+                <button
+                  className="w-2 h-2 hover:text-gray-400 p-1"
+                  onMouseOver={() => setOpenDropdown(openDropdown === idx ? null : idx)}
+                >
+                  <MoreVertical size={16} />
+                </button>
+              </div>
+
+            
+              {openDropdown === idx && (
+                <div className="absolute top-6 right-[-200px] bg-gray-800 text-white text-sm rounded shadow-lg w-64 z-20">
+                  <ul className="divide-y divide-gray-700">
+                    <li className="hover:bg-gray-700 px-4 py-2 cursor-pointer flex justify-between">
+                      Save for later <span className="text-gray-400">A</span>
+                    </li>
+                    <li className="hover:bg-gray-700 px-4 py-2 cursor-pointer">
+                      Turn off notifications for replies
+                    </li>
+                    <li
+                      onClick={() => handleDeleteMsg(msg.id)}
+                      className="hover:bg-gray-700 px-4 py-2 cursor-pointer flex justify-between text-red-400"
+                    >
+                      Delete message... <span className="text-red-300">delete</span>
+                    </li>
+                    <li
+                      onClick={() => handleEditMsg(msg)}
+                      className="hover:bg-gray-700 px-4 py-2 cursor-pointer"
+                    >
+                      Edit message <span className="text-gray-400">E</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+           
+              <div className="text-sm text-gray-800">
+           
+                {!attachments?.length && msg.message && (
+                  <div className="bg-white p-2 rounded shadow max-w-sm">
+                    <span className="p-2 block">{msg.user.first_name}</span>
+                    <p className="text-sm mb-2 text-gray-700">{msg.message}</p>
+                    <span className="text-xs text-gray-300 block mt-1 text-right">{time}</span>
+                  </div>
+                )}
+
+               
+                {attachments.length > 0 &&
+                  attachments.map((file, i) => {
+                    const isImage =
+                      file.file_type.includes("image") ||
+                      file.file_type.includes("jpeg") ||
+                      file.file_type.includes("png") ||
+                      file.file_type.includes("gif");
+
+                    if (isImage) {
+                      return (
+                        <div key={i} className="bg-white p-2 rounded shadow max-w-sm">
+                          <span className="p-2 block">{msg.user.first_name}</span>
+                          {msg.message && (
+                            <p className="text-sm mb-2 text-gray-700">{msg.message}</p>
+                          )}
+                          <img
+                            src={`${baseImgUrl}/${file.file_path}`}
+                            alt={file.original_name}
+                            className="rounded max-h-60 object-cover cursor-pointer hover:opacity-90"
+                            onClick={() => setImagePreview(`${baseImgUrl}/${file.file_path}`)}
+                          />
+                          <span className="text-xs text-gray-300 block mt-1 text-right">{time}</span>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={i}
+                        className="bg-white p-2 rounded shadow max-w-sm text-xs text-gray-600"
+                      >
+                        <span className="p-2 block">{msg.user.first_name}</span>
+                        {msg.message && (
+                          <p className="text-sm mb-2 text-gray-700">{msg.message}</p>
+                        )}
+                        📎{" "}
+                        <a
+                          href={`/${file.file_path}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          {file.original_name}
+                        </a>
+                        <span className="text-xs text-gray-300 block mt-1 text-right">{time}</span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          );
+        })}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -360,6 +503,37 @@ export default function ChatBody() {
         members={channelMembers || []}
       />
 
+     {imagePreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+            <div className="relative max-w-3xl max-h-[90vh] flex flex-col">
+                {/* Close button */}
+                <button
+                    className="absolute -top-10 right-0 text-white hover:text-gray-300"
+                    onClick={() => setImagePreview(null)}
+                >
+                    <X size={28} />
+                </button>
+
+                {/* Image */}
+                <img
+                    src={imagePreview}
+                    alt="preview"
+                    className="rounded-lg max-h-[80vh] object-contain"
+                />
+
+                {/* Bottom bar with Download button */}
+                <div className="flex justify-center mt-3">
+                    <a
+                        href={imagePreview}
+                        download
+                        className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow hover:bg-gray-200 text-gray-700"
+                    >
+                        <Download size={18} /> Download
+                    </a>
+                </div>
+            </div>
+        </div>
+    )}
 
       {/* Modal Preview */}
       {showModal && (

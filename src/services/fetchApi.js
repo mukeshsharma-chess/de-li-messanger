@@ -35,4 +35,14 @@ export default class fetchApi extends Api {
         return this.fetch(url, "GET", null, null).then(response => response)
     }
 
+    SendMessageToChannel(data) {
+        let url = this.buildUrl(`${endpoints.Channels.messages}`, "full")
+        return this.fetch(url, "POST", data).then(response => response)
+    }
+
+    DeleteMessageToChannel(data) {
+        let url = this.buildUrl(`${endpoints.Channels.messages}/${data}`, "full")
+        return this.fetch(url, "DELETE", null).then(response => response)
+    }
+
 }

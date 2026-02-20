@@ -1,6 +1,4 @@
 import { regEx } from './constant'
-import { loadState, saveState } from '../utils/localstorage'
-import axios from 'axios';
 const URL = process.env.NEXT_PUBLIC_BASE_URL
 
 // const api = new Api()
@@ -47,51 +45,6 @@ export function fetchWithWait({ dispatch, action }) {
   })
 }
 
-
-export function generateOrderId() {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  let orderId = result + Date.now()
-  return orderId;
-}
-
-export function generateCartId() {
-  let result = '';
-  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < 4; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  let orderId = result + Date.now()
-  return orderId;
-}
-
-export function sessionId() {
-  var appuser = loadState("appuser");
-  var userIdExpiry = loadState("userIdExpiry");
-
-  if (!appuser || !userIdExpiry || new Date() > new Date(userIdExpiry)) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const expiryDate = new Date().setFullYear(new Date().getFullYear() + 1);
-    const charactersLength = characters.length;
-
-    for (let i = 0; i < 6; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    saveState('appuser', result);
-    saveState('userIdExpiry', expiryDate);
-    return result;
-  } else {
-    return appuser;
-  }
-}
-
-
 export function setPath(key, value) {
   localStorage.setItem(key, value);
 }
@@ -107,119 +60,6 @@ export function setUser(key, value) {
 export function getToken(key) {
   const token = localStorage.getItem(key);
   return token;
-}
-
-
-// export const checkTokenExpiration = () => {
-//   let accessToken = null;
-
-//   const token = loadState("token");
-//   const expiration = loadState("expInToken") * 1000;
-//   const refToken = { "refreshToken": loadState("refreshToken") }
-
-//   if (token && expiration && Date.now() < expiration) {
-//     accessToken = token;
-//     return accessToken;
-//   } else {
-//     api.RefreshToken(refToken)
-//       .then(res => {
-//         const { refreshToken, token, refresh_token_expiration } = res;
-//         const expirationTime = parseInt(refresh_token_expiration);
-
-//         saveState("token", token)
-//         saveState("refreshToken", refreshToken)
-//         saveState("expInToken", expirationTime)
-
-//         accessToken = token;
-//       })
-//       .catch(err => {
-//         console.log(err);
-//       });
-//   }
-// }
-
-
-export const finalSellPrice = (data) => {
-  // console.log("data is data", data)
-  let finalPrice = 0
-  let finalDiscont = 0;
-  let baseSellPrice = 0;
-  let disInPersent = 0;
-  data?.forEach(element => {
-    const { purchasePrice: { color, discountAmount, discountValue, promotionDiscount, currency, discountType, finalSellPrice, mrp, priceType, size, subTotal, tax, taxValue } } = element
-    if (finalSellPrice !== null) {
-      finalPrice = finalSellPrice;
-      finalDiscont = parseFloat(discountValue);
-      disInPersent = discountValue || promotionDiscount;
-      baseSellPrice = mrp;
-    }
-  });
-
-  // let minprice = Math.min(...finalPrice)
-
-  let price = {
-    finalPrice,
-    finalDiscont,
-    baseSellPrice,
-    disInPersent
-  }
-
-  return { finalPrice, finalDiscont, baseSellPrice, disInPersent } = price
-}
-
-
-export function generateRanges(start, end, count, length) {
-  // console.log("generateRangesgenerateRanges", start, end,count)
-  const rangeWidth = Math.ceil((end - start) / count);
-  const ranges = [];
-  
-
- if(start !== end){
-  if(length < 5 ){
-    for (let i = 0; i < length; i++) {
-      if(i === 0){
-       let rangeStart = parseInt(start) + (i * rangeWidth);
-       const rangeEnd = Math.min(parseInt(start) + ((i + 1) * rangeWidth), end);
- 
-       ranges.push({ start: rangeStart, end: rangeEnd });
-      }else{
-        let rangeStart = parseInt(start) + (i * rangeWidth) + 1;
-        const rangeEnd = Math.min(parseInt(start) + ((i + 1) * rangeWidth), end);
- 
-       ranges.push({ start: rangeStart, end: rangeEnd });
-      }
-   }
-  }else{
-    for (let i = 0; i < count; i++) {
-      if(i === 0){
-        let rangeStart = parseInt(start) + (i * rangeWidth);
-       const rangeEnd = Math.min(parseInt(start) + ((i + 1) * rangeWidth), end);
- 
-       ranges.push({ start: rangeStart, end: rangeEnd });
-      }else{
-        let rangeStart = parseInt(start) + (i * rangeWidth) + 1;
-       const rangeEnd = Math.min(parseInt(start) + ((i + 1) * rangeWidth), end);
- 
-       ranges.push({ start: rangeStart, end: rangeEnd });
-      }
-    }
-  }
-  return ranges;
- }
-  for (let i = 0; i < 1; i++) {
-    if(i === 0){
-      let rangeStart = parseInt(start) + (i * rangeWidth);
-    const rangeEnd = Math.min(parseInt(start) + ((i + 1) * rangeWidth), end);
-
-    ranges.push({ start: rangeStart, end: rangeEnd });
-    }else{
-      let rangeStart = parseInt(start) + (i * rangeWidth) + 1;
-    const rangeEnd = Math.min(parseInt(start) + ((i + 1) * rangeWidth), end);
-
-    ranges.push({ start: rangeStart, end: rangeEnd });
-    }
-  }
-  return ranges;
 }
 
 

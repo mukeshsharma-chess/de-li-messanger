@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import WorkspaceSidebar from '../WorkSidebar';
 import Sidebar from '../Sidebar';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,23 +10,34 @@ import { fetchWorkSpaceAction } from '@/redux/actions/workSpaceAction';
 const ParentSidebar = () => {
 
     const dispatch = useDispatch();
+    const [user, setUser] = useState(null);
 
-    const user = loadState('user')
-
-    const { allWorkSpace, selectedWorkSpace, allChannel, selectedChannel } = useSelector((state) => state.wrokSpace)
+    const { allWorkSpace, selectedWorkSpace, allChannel, selectedChannel } = 
+      useSelector((state) => state.wrokSpace)
 
     useEffect(() => {
-        user && dispatch(fetchWorkSpaceAction())
-    },[])
+        const storedUser = loadState('user');
+        setUser(storedUser);
 
-    // console.log("allWorkSpaceallWorkSpace", allWorkSpace)
-    // console.log("selectedWorkSpaceselectedWorkSpace", selectedWorkSpace)
-    // console.log("allChannelallChannel", allChannel)
+        if (storedUser) {
+            dispatch(fetchWorkSpaceAction());
+        }
+    }, [dispatch]);
+
+  if (!user) return null; // 👈 Important
 
   return (
     <>
-        <WorkspaceSidebar allWorkSpace = {allWorkSpace} selectedWorkSpace = {selectedWorkSpace}  />
-        <Sidebar user = {user} allChannel = {allChannel} selectedChannel = {selectedChannel} selectedWorkSpaceId={selectedWorkSpace?.id}  />
+        <WorkspaceSidebar 
+          allWorkSpace={allWorkSpace} 
+          selectedWorkSpace={selectedWorkSpace}  
+        />
+        <Sidebar 
+          user={user} 
+          allChannel={allChannel} 
+          selectedChannel={selectedChannel} 
+          selectedWorkSpaceId={selectedWorkSpace?.id}  
+        />
     </>
   )
 }

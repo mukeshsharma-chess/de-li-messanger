@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
 import { createStore, applyMiddleware, compose } from "redux";
 import reducers from "./reducers";
 import createSagaMiddleware from "redux-saga";
 import rootSaga from "../sagas";
 import { Provider } from "react-redux";
+import { useRef } from "react";
 
-const sagaMiddleware = createSagaMiddleware();
+function ReduxProvider({ children }) {
+  const storeRef = useRef(null);
 
-// middlewares
-const middlewares = [sagaMiddleware];
+  if (!storeRef.current) {
+    const sagaMiddleware = createSagaMiddleware();
 
-// ✅ DevTools setup (development mode में ही enable)
-const composeEnhancers =
-  typeof window !== "undefined" &&
-  process.env.NODE_ENV !== "production" &&
-  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    : compose;
+    const composeEnhancers =
+      process.env.NODE_ENV !== "production" &&
+      typeof window !== "undefined" &&
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        : compose;
 
-// store create
-const store = createStore(
-  reducers,
-  composeEnhancers(applyMiddleware(...middlewares))
-);
+    const store = createStore(
+      reducers,
+      composeEnhancers(applyMiddleware(sagaMiddleware))
+    );
 
-sagaMiddleware.run(rootSaga);
+    sagaMiddleware.run(rootSaga);
 
-store.asyncReducers = {};
+    storeRef.current = store;
+  }
 
-export function ReduxProvider({ children }) {
-  return <Provider store={store}>{children}</Provider>;
+  return <Provider store={storeRef.current}>{children}</Provider>;
 }
 
 export default ReduxProvider;
