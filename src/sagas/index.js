@@ -4,6 +4,8 @@ import { userLoginSaga } from './loginSaga';
 import { addNewChannelSaga, addNewWrokSpace, deleteMessageToChannelSaga, fetchAllWrokSpace, getChannelMemberSaga, getLatestMessagesChannelSaga, sendMessageToChannelSaga } from './workSpaceSaga';
 import { ADD_NEW_CHANNEL_REQUEST, ADD_NEW_WORK_SPACE_REQUEST, FETCH_WORK_SPACE_REQUEST } from '@/redux/types/workSpaceType';
 import { ADD_NEW_CHATTING_WITH_CHANNEL_DATA_REQUEST, DELETE_CHATTING_WITH_CHANNEL_DATA_REQUEST, GET_LATEST_MESSAGE_OF_CHANNEL_REQUEST, MEMBER_OF_CHANNEL_REQUEST } from '@/redux/types/chattingWithChannelType';
+import { ALL_CONVERSATION_FOR_DM_REQUEST, CONVERSATION_TO_USER_FOR_DM_REQUEST, DELETE_CONVERSATION_FOR_DM_REQUEST, SHOW_CONVERSATION_FOR_DM_REQUEST, START_CONVERSATION_FOR_DM_REQUEST, UPDATE_CONVERSATION_FOR_DM_REQUEST, USER_FOR_DM_REQUEST } from '@/redux/types/directMsgType';
+import { allConversationForDmSaga, conversationToUserForDmSaga, deleteConversationForDmSaga, showConversationForDmSaga, startConverrsationForDmSaga, updateConversationForDmSaga, userForDmSaga } from './directMessageSaga';
 
 function* rootSaga() {
     yield all([
@@ -15,7 +17,13 @@ function* rootSaga() {
         takeLatest(GET_LATEST_MESSAGE_OF_CHANNEL_REQUEST, getLatestMessagesChannelSaga),
         takeLatest(ADD_NEW_CHATTING_WITH_CHANNEL_DATA_REQUEST, sendMessageToChannelSaga),
         takeLatest(DELETE_CHATTING_WITH_CHANNEL_DATA_REQUEST, deleteMessageToChannelSaga),
-
+        takeLatest(ALL_CONVERSATION_FOR_DM_REQUEST, allConversationForDmSaga),
+        takeLatest(CONVERSATION_TO_USER_FOR_DM_REQUEST, conversationToUserForDmSaga),
+        takeLatest(DELETE_CONVERSATION_FOR_DM_REQUEST, deleteConversationForDmSaga),
+        takeLatest(SHOW_CONVERSATION_FOR_DM_REQUEST, showConversationForDmSaga),
+        takeLatest(START_CONVERSATION_FOR_DM_REQUEST, startConverrsationForDmSaga),
+        takeLatest(UPDATE_CONVERSATION_FOR_DM_REQUEST, updateConversationForDmSaga),
+        takeLatest(USER_FOR_DM_REQUEST, userForDmSaga),
 
     ]);
 }

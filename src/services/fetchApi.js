@@ -45,4 +45,24 @@ export default class fetchApi extends Api {
         return this.fetch(url, "DELETE", null).then(response => response)
     }
 
+    GetAllDmUsers(data) {
+        let url = this.buildUrl(endpoints.Dms.users, "full")
+        return this.fetch(url, "GET", null, data).then(response => response)
+    }
+
+    GetAllDmConversations(data) {
+        let url = this.buildUrl(endpoints.Dms.conversations, "full")
+        return this.fetch(url, "GET", null, data).then(response => response)
+    }
+
+    SendMessageToChannel(data) {
+        let url = this.buildUrl(`${endpoints.Dms.conversations}/start/${data.receiverId}`, "full")
+        return this.fetch(url, "POST", data).then(response => response)
+    }
+
+    ShowDirectMessage(data) {
+        let url = this.buildUrl(`${endpoints.Dms.conversations}/${data.id}`, "full")
+        return this.fetch(url, "GET", null, data).then(response => response)
+    }
+
 }

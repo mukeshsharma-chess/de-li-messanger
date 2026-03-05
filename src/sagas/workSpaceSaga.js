@@ -11,7 +11,7 @@ export function* addNewWrokSpace({ payload, resolve }) {
         yield put({ type: START_LOADING, isLoading: true })
         let response = yield api.AddNewWorkSpace(payload);
 
-        console.log("addNewWrokSpace", response)
+        // console.log("addNewWrokSpace", response)
         const {data, status} = response;
 
         if (status === 200) {

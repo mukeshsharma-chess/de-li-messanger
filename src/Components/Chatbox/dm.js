@@ -387,6 +387,16 @@ export default function Dmessage() {
                     <input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            if (showModal) {
+                                handleConfirmSend(e);
+                            } else {
+                                handleSend(e);
+                            }
+                            }
+                        }}
                         placeholder="Type a message"
                         className="flex-1 border rounded px-3 py-1 text-sm outline-none focus:ring focus:ring-purple-200"
                     />

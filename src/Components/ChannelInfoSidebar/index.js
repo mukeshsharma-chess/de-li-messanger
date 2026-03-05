@@ -42,16 +42,16 @@ export default function ChannelInfoSidebar({ open, onClose, channel, members }) 
               >
                 <img
                   src={m.profile || "/images/individual.webp"}
-                  alt={m.first_name}
+                  alt={m.name}
                   className="w-8 h-8 rounded-full"
                 />
                 <div>
-                  <p className="font-medium">{m.first_name}</p>
+                  <p className="font-medium">{m.name}</p>
                   <p className="text-xs text-gray-500">{m.status || "Active"}</p>
                 </div>
                 {m.is_admin && (
                   <span className="ml-auto text-xs bg-green-200 text-green-700 px-2 py-1 rounded">
-                    Admin
+                    {is_admin}
                   </span>
                 )}
               </li>

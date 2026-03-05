@@ -10,10 +10,12 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import AddNewChannel from "../AddNewChannel";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Sidebar = ({ user, allChannel, selectedChannel, selectedWorkSpaceId }) => {
   const [addNewChannel, setAddNewChannal] = useState(false);
+
+  const { allUser } = useSelector((state) => state.directMsg);
 
   const dispatch = useDispatch();
 
@@ -55,6 +57,18 @@ const Sidebar = ({ user, allChannel, selectedChannel, selectedWorkSpaceId }) => 
         ))}
 
         <SidebarItem icon={<Users size={16} />} label="People & user groups" />
+
+        {allUser &&
+          allUser.map((user) =>
+            user.id === localUser ? null : (
+              <SidebarItem
+                key={user.id}
+                icon={<AtSign size={16} />}
+                label={user.name}
+                // onClick={() => onChannelSelect(channel)}
+              />
+            )
+          )}
 
       </div>
 
