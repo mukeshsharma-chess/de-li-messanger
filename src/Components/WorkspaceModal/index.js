@@ -9,16 +9,20 @@ const WorkspaceModal = ({ allWorkSpace, selectedWorkSpace, showWorkSpaceModel })
 
 
   const dispatch = useDispatch();
-  const modalRef = useRef(null); // reference for modal
+  const modalRef = useRef(null);
 
   const hanldeAddWorkSpace = () => {
     dispatch(showWorkSpaceAction(false));
     dispatch(openWorkSpaceAction(true));
   };
 
+
   const handleSelectWorkspace = (id) => {
     dispatch(selectedWorkspaceAction(id));
-    dispatch(showWorkSpaceAction(!showWorkSpaceModel))
+
+    dispatch({ type: "SET_VIEW_MODE", payload: "channel" });
+
+    dispatch(showWorkSpaceAction(false));
   };
 
   // Close modal if click outside

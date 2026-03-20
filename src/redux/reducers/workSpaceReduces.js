@@ -1,5 +1,5 @@
 import {
-    GET_LATEST_MESSAGE_OF_CHANNEL_RESPONSE, GET_LATEST_MESSAGE_OF_CHANNEL_FAILED,
+    GET_LATEST_MESSAGE_OF_CHANNEL_RESPONSE, GET_LATEST_MESSAGE_OF_CHANNEL_FAILED, SET_VIEW_MODE,
     ADD_NEW_CHATTING_WITH_CHANNEL_DATA_RESPONSE, ADD_NEW_CHATTING_WITH_CHANNEL_DATA_FAILED,
     CHATTING_WITH_CHANNEL_DETAILS_DATA_RESPONSE,
     CHATTING_WITH_CHANNEL_DETAILS_DATA_FAILED,
@@ -11,6 +11,7 @@ import { ADD_NEW_WORK_SPACE_FAILED, ADD_NEW_WORK_SPACE_RESPONSE, FETCH_WORK_SPAC
 
 
 const initialState = {
+    viewMode: "channel",
     allWorkSpace: null,
     addNewWorkSpace: null,
     allChannel: null,
@@ -32,14 +33,29 @@ export default function reducer(state = initialState, action) {
         case FETCH_WORK_SPACE_FAILED:
             return { ...state, allWorkSpace: action.payload }
 
-        case SELECT_WORK_SPACE_REQUEST:
-            return { ...state, selectedWorkSpace: state.allWorkSpace.find(item => item.id === action.payload),
-                allChannel : state.allWorkSpace.find(item => item.id === action.payload).channels,
-                selectedChannel: state.allWorkSpace.find(item => item.id === action.payload).channels[0]
-            }
+
+        case SELECT_WORK_SPACE_REQUEST: {
+            const selectedWS = state.allWorkSpace?.find(
+                (item) => item.id === action.payload
+            );
+
+            return {
+                ...state,
+                selectedWorkSpace: selectedWS || null,
+                allChannel: selectedWS?.channels || [],
+                selectedChannel: selectedWS?.channels?.[0] || null,
+            };
+        }
+        
+        case "SET_VIEW_MODE":
+            return { ...state, viewMode: action.payload }
 
         case SET_SELECTED_CHANNEL:
-             return { ...state, selectedChannel: action.payload }
+            return { 
+                ...state, 
+                selectedChannel: action.payload,
+                chattingList: []
+            }
 
         case ADD_NEW_WORK_SPACE_RESPONSE:
             return { ...state, addNewWorkSpace: action.payload }

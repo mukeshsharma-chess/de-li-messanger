@@ -1,11 +1,6 @@
 "use client";
 
 import { fetchWithWait } from "@/helper/method";
-// import {
-//     chattingWithChannelAction, deleteChattingWithChannelAction,
-//     fetchChattingDataWithChannel, membersOfChannelAction,
-//     updatedChattingWithChannelAction
-// } from "@/redux/actions/chattingWithChannelAction";
 import {
     Paperclip,
     ImagePlus,
@@ -14,22 +9,23 @@ import {
     MoreVertical,
     X,
     Send,
+    Download,
 } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import EditMessageModal from "../EditMessage";
+import EditMessageModal from "../EditMessageModal";
 // import ChannelInfoSidebar from "../Channel/ChannelInfoSidebar";
 import {
-    dmParticularConversationAction, showDMConversationAction, fetchAllDMConversationAction,
+    dmParticularUseronAction, showDMConversationAction,
     deleteDMConversationAction, updateDMConversationAction
 } from "@/redux/actions/directMessageAction";
 
 
 
-const imgBaseUrl = process.env.NEXT_PUBLIC_STORAGE_BASE_URL;
+const imgBaseUrl = process.env.NEXT_PUBLIC_IMG_BASE_URL
 
-export default function Dmessage() {
+export default function DMChatBody() {
     const fileInputRef = useRef(null);
     const imageInputRef = useRef(null);
     const messagesEndRef = useRef(null);
@@ -57,24 +53,27 @@ export default function Dmessage() {
 
     const dispatch = useDispatch();
 
-    const { allDirectMsg, selectedDMUser, dmMessageList, allUser, allConversation } = useSelector((state) => state.directMsg);
+    const { allDirectMsg, selectedDMUser, dmMessageList, selectedDmId, allConversation } = useSelector((state) => state.directMsg);
     const { user } = useSelector((state) => state.login);
 
 
     // console.log("selectedDMUser:", selectedDMUser);
     // console.log("allDirectMsgallDirectMsg", allDirectMsg);
-    // console.log("allUser", allUser);
+    // console.log("allUser", selectedDmId);
+    // console.log("allConversation", allConversation);
+    // console.log("dmMessageList", dmMessageList);
 
     // useEffect(() => {
-    //   dispatch(fetchAllDMConversationAction());
+    //     dispatch(fetchAllDMConversationAction());
+    //     alert("hi")
     // }, []);
 
 
-    useEffect(() => {
-        if (selectedDMUser) {
-            dispatch(showDMConversationAction({ "id": selectedDMUser?.id }));
-        }
-    }, [selectedDMUser]);
+    // useEffect(() => {
+    //     if (selectedDMUser) {
+    //         dispatch(showDMConversationAction({ "id": selectedDmId }));
+    //     }
+    // }, [selectedDMUser]);
 
 
 
@@ -86,33 +85,36 @@ export default function Dmessage() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    /** ---- Send text only ---- **/
-    const handleSend = (e) => {
 
+    const handleSend = (e) => {
         e.preventDefault();
+
         if (!input.trim()) return;
+
         try {
             const formData = new FormData();
-            formData.append("conversation_id", selectedDMUser?.user_two_id);
-            formData.append("sender_id", selectedDMUser?.user_one_id);
+
+            formData.append("conversation_id", selectedDmId);
+            formData.append("sender_id", user.id); 
             formData.append("message", input);
-            // formData.append("reply_to_id", 0);
-            // formData.append("forwarded_from_id", 0);
 
-            const data = { formData, "id": selectedDMUser?.id }
+            const data = { formData, id: selectedDmId };
 
-            // console.log("data to send:", data);
-
-            fetchWithWait({ dispatch, action: dmParticularConversationAction(data) }).then((res) => {
-                if (res.status === 200) {
-                    dispatch(showDMConversationAction({ "id": selectedDMUser?.id }));
-                } else {
-                    alert(res.message)
-                }
-            }).catch((e) => {
-                console.log(`error`, e)
+            fetchWithWait({
+                dispatch,
+                action: dmParticularUseronAction(data)
             })
-            setMessages([...messages, { text: input }]);
+            .then((res) => {
+                console.log("SEND RESPONSE", res);
+
+                if (res.status === 200) {
+                    dispatch(showDMConversationAction({ id: selectedDmId }));
+                } else {
+                    alert(res.message);
+                }
+            })
+            .catch((e) => console.log("error", e));
+
             setInput("");
         } catch (err) {
             console.error("Error sending text message:", err);
@@ -147,21 +149,25 @@ export default function Dmessage() {
 
         try {
             const formData = new FormData();
-            formData.append("conversation_id", selectedDMUser?.user_two_id);
-            formData.append("sender_id", selectedDMUser?.user_one_id);
+            formData.append("conversation_id", selectedDmId);
+            formData.append("sender_id", user.id);
             formData.append("message", caption);
             // formData.append("reply_to_id", 0);
             // formData.append("forwarded_from_id", 0);
 
-            if (previewType === "image" || previewType === "file") {
+            // if (previewType === "image" || previewType === "file") {
+            //     formData.append("attachments[]", previewFile, previewFile.name);
+            // }
+
+            if (previewFile) {
                 formData.append("attachments[]", previewFile, previewFile.name);
             }
 
-            const data = { formData, "id": selectedDMUser?.id }
+            const data = { formData, "id": selectedDmId }
 
-            fetchWithWait({ dispatch, action: dmParticularConversationAction(data) }).then((res) => {
+            fetchWithWait({ dispatch, action: dmParticularUseronAction(data) }).then((res) => {
                 if (res.status === 200) {
-                    dispatch(showDMConversationAction({ "id": selectedDMUser?.id }));
+                    dispatch(showDMConversationAction({ "id": selectedDmId }));
                 } else {
                     alert(res.message)
                 }
@@ -184,7 +190,7 @@ export default function Dmessage() {
 
         fetchWithWait({ dispatch, action: deleteDMConversationAction(id) }).then((res) => {
             if (res.status === 200) {
-                dispatch(showDMConversationAction({ "id": selectedDMUser?.id }));
+                dispatch(showDMConversationAction({ "id": selectedDmId }));
             } else {
                 alert(res.message)
             }
@@ -202,7 +208,6 @@ export default function Dmessage() {
         setOpenDropdown(null);
     };
 
-    console.log("editMsgDataeditMsgData:", editMsgData);
 
     /** ---- Save Edit ---- **/
     const handleEditSave = (value) => {
@@ -213,8 +218,8 @@ export default function Dmessage() {
 
         try {
             const formData = new FormData();
-            formData.append("conversation_id", selectedDMUser?.user_two_id);
-            formData.append("sender_id", selectedDMUser?.user_one_id);
+            formData.append("conversation_id", selectedDmId);
+            formData.append("sender_id", user?.id);
             formData.append("message", value);
             // formData.append("reply_to_id", 0);
             // formData.append("forwarded_from_id", 0);
@@ -227,7 +232,7 @@ export default function Dmessage() {
 
             fetchWithWait({ dispatch, action: updateDMConversationAction(data) }).then((res) => {
                 if (res.status === 200) {
-                    dispatch(showDMConversationAction({ "id": selectedDMUser?.id }));
+                    dispatch(showDMConversationAction({ "id": selectedDmId }));
                 } else {
                     alert(res.message)
                 }
@@ -245,12 +250,6 @@ export default function Dmessage() {
         setEditModalOpen(false);
         setEditMsg(null);
     };
-
-    // console.log("dmMessageListdmMessageList:", dmMessageList);
-    // console.log("selectedDMUserselectedDMUser:", selectedDMUser);
-    // console.log("allDirectMsgallDirectMsg:", allDirectMsg);
-    // console.log("allConversation", allConversation);
-
 
 
     return (
@@ -334,7 +333,7 @@ export default function Dmessage() {
 
                                 {attachments.length > 0 &&
                                     attachments.map((file, i) => {
-                                        if (file.file_type === "image" || file.file_type === "image/jpeg" || file.file_type === "jpeg" || file.file_type === "png" || file.file_type === "gif" || file.file_type === "video") {
+                                        if (file.file_type === "image" || file.file_type === "image/jpeg" || file.file_type === "jpeg" || file.file_type === "image/webp" || file.file_type === "png" || file.file_type === "gif" || file.file_type === "video") {
                                             return (
                                                 <div key={i} className="bg-white p-2 rounded shadow max-w-sm">
                                                     <span className="p-2 block">{msg?.sender.name}</span>
@@ -415,18 +414,10 @@ export default function Dmessage() {
                 open={editModalOpen}
                 initialValue={editMsg && editMsg}
                 onClose={() => setEditModalOpen(false)}
-                handleUpdateMessage={handleEditSave}
+                onSave={handleEditSave}
             />
 
-            {/* <ChannelInfoSidebar
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        channel={selectedDMUser}
-        members={channelMembers || []}
-      /> */}
 
-
-            {/* Modal Preview */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg p-4 w-96 relative">
@@ -460,8 +451,7 @@ export default function Dmessage() {
                 </div>
             )}
 
-            {/* Image Preview Modal */}
-            {/* Image Preview Modal */}
+
             {imagePreview && (
                 <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
                     <div className="relative max-w-3xl max-h-[90vh] flex flex-col">

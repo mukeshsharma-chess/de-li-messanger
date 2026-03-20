@@ -13,6 +13,7 @@ import {
 import WorkspaceModal from '../WorkspaceModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { showWorkSpaceAction } from '@/redux/actions/workSpaceAction';
+import { allUserForDMAction } from '@/redux/actions/directMessageAction';
 
 
 const baseImgUrl = process.env.NEXT_PUBLIC_IMG_BASE_URL
@@ -28,6 +29,11 @@ const WorkspaceSidebar = ({  allWorkSpace, selectedWorkSpace }) => {
   const handleOpenAddNewWorkModel = () =>{
     dispatch(showWorkSpaceAction(true))
   }
+
+  const handleDMClick = () => {
+    dispatch({ type: "SET_VIEW_MODE", payload: "dm" });
+    dispatch(allUserForDMAction());
+  };
 
   return (
     <div className="relative w-16 bg-[#2c003e] h-screen flex flex-col justify-between items-center py-4 text-white">
@@ -55,7 +61,7 @@ const WorkspaceSidebar = ({  allWorkSpace, selectedWorkSpace }) => {
             </div>
             <span>Home</span>
           </div>
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-1 cursor-pointer" onClick={handleDMClick}>
             <MessageSquare size={20} />
             <span>DMs</span>
           </div>

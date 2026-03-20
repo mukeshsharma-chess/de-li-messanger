@@ -21,17 +21,16 @@ const initialState = {
     dmMessageList: null,
     selectedDMUser: null,
     allConversation: null,
-
+    selectedDmId: null,
 }
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
 
         case USER_FOR_DM_RESPONSE:
-            // console.log("USER_FOR_DM_RESPONSE in reducer", action);
-            return { ...state, allUser: action.payload.users }
+            return { ...state, allUser: action.payload }
         case USER_FOR_DM_FAILED:
-            return { ...state, allUser: action.action.payload.users }
+            return { ...state, allUser: action.payload.users }
 
         case ALL_CONVERSATION_FOR_DM_RESPONSE:
             return { ...state, allConversation: action.payload.conversations, selectedDMUser: action.payload.conversations[0] }
@@ -45,12 +44,12 @@ export default function reducer(state = initialState, action) {
             return { ...state, selectedDMUser: action.payload }
 
         case SHOW_CONVERSATION_FOR_DM_RESPONSE:
-            console.log("SHOW_CONVERSATION_FOR_DM_RESPONSE in reducer", action.payload.user_two_id, state.allConversation);
             return {
                 ...state,
                 allDirectMsg: action.payload,
                 dmMessageList: action.payload.messages,
-                selectedDMUser: state.allConversation?.find(item => item.user_two_id === action.payload.user_two_id)
+                selectedDmId: action.payload.id,
+                selectedDMUser: state.allUser?.find(item => item.id === action.payload.user_two_id)
             }
 
         case SHOW_CONVERSATION_FOR_DM_FAILED:

@@ -50,19 +50,33 @@ export default class fetchApi extends Api {
         return this.fetch(url, "GET", null, data).then(response => response)
     }
 
-    GetAllDmConversations(data) {
-        let url = this.buildUrl(endpoints.Dms.conversations, "full")
-        return this.fetch(url, "GET", null, data).then(response => response)
+    startConverrsationForDm(data) {
+        let url = this.buildUrl(`${endpoints.Dms.conversations}/start/${data.user_two_id}`, "full")
+        return this.fetch(url, "POST", data).then(response => response)
     }
 
-    SendMessageToChannel(data) {
-        let url = this.buildUrl(`${endpoints.Dms.conversations}/start/${data.receiverId}`, "full")
-        return this.fetch(url, "POST", data).then(response => response)
+    GetAllDmConversations() {
+        let url = this.buildUrl(endpoints.Dms.conversations, "full")
+        return this.fetch(url, "GET", null, null).then(response => response)
     }
 
     ShowDirectMessage(data) {
         let url = this.buildUrl(`${endpoints.Dms.conversations}/${data.id}`, "full")
-        return this.fetch(url, "GET", null, data).then(response => response)
+        return this.fetch(url, "GET", null).then(response => response)
     }
 
+    DMessageToPerticularUser(data) {
+        let url = this.buildUrl(`${endpoints.Dms.conversations}/${data.id}/messages`, "full")
+        return this.fetch(url, "POST", data.formData).then(response => response)
+    }
+    
+    UpdateDMessage(data) {
+        let url = this.buildUrl(`${endpoints.Dms.conversations}/messages/${data.id}`, "full")
+        return this.fetch(url, "PUT", data.formData).then(response => response)
+    }
+
+    DeleteDMessage(data) {
+        let url = this.buildUrl(`${endpoints.Dms.conversations}/messages/${data}`, "full")
+        return this.fetch(url, "DELETE", null).then(response => response)
+    }
 }

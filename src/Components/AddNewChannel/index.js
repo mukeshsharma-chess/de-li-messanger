@@ -53,7 +53,7 @@ const AddNewChannel = ({ addNewChannel, setAddNewChannal, selectedWorkSpaceId })
   }
 
   return (
-    <div className="absolute top-[-100px] left-[200px] bg-gray-900 text-white w-[400px] p-6 rounded-lg shadow-xl space-y-5">
+    <div className="absolute top-[-100px] z-9 left-[200px] bg-gray-900 text-white w-[400px] p-6 rounded-lg shadow-xl space-y-5">
       <div className="flex justify-end">
         <button onClick={() => setAddNewChannal(!addNewChannel)} className="text-sm text-gray-400 mb-2 cursor-pointer">X</button>
       </div>
